@@ -1092,7 +1092,7 @@ typedef struct MDB_page {
 #define mp_pad		mp_hdr.mh_pad
 #define mp_flags	mp_hdr.mh_flags
 #define mp_pb		mp_hdr.mh_pb
-	indx_t		mp_ptrs[0];		/**< dynamic size */
+	indx_t		mp_ptrs[];		/**< dynamic size */
 } MDB_page;
 
 /** Alternate page header, for 2-byte aligned access */
@@ -1102,7 +1102,7 @@ typedef struct MDB_page2 {
 	uint16_t	mp2_flags;
 	indx_t		mp2_lower;
 	indx_t		mp2_upper;
-	indx_t		mp2_ptrs[0];
+	indx_t		mp2_ptrs[];
 } MDB_page2;
 
 #define MP_PGNO(p)	(((MDB_page2 *)(void *)(p))->mp2_p)
@@ -4227,7 +4227,7 @@ retry_write:
 						if (wres != MAX_WRITE)
 							goto bad_write;;
 						wpos += MAX_WRITE;
-						iov[0].iov_base += MAX_WRITE;
+						iov[0].iov_base = (char *)iov[0].iov_base + MAX_WRITE;
 					}
 					wres = pwrite(fd, iov[0].iov_base, wsize, wpos);
 				} else {
@@ -6406,7 +6406,7 @@ leave:
 
 /** When #MDB_ENV_ACTIVE: Clear #mdb_env_open()ed resources, release readers */
 static void ESECT
-mdb_env_close_active(MDB_env *env, int excl)
+mdb_env_close_active(MDB_env *env, int __attribute__((unused)) excl)
 {
 	int i;
 
@@ -12391,7 +12391,7 @@ int mdb_set_relctx(MDB_txn *txn, MDB_dbi dbi, void *ctx)
 }
 
 int ESECT
-mdb_env_get_maxkeysize(MDB_env *env)
+mdb_env_get_maxkeysize(MDB_env __attribute__((unused)) *env)
 {
 	return ENV_MAXKEY(env);
 }

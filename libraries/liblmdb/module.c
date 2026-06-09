@@ -51,7 +51,7 @@ mdb_modload(const char *file, const char *name, MDB_crypto_funcs **mcf_ptr, char
 	{
 		void *mlm = dlopen(file, RTLD_NOW);
 		if (mlm) {
-			hookfunc = dlsym(mlm, name);
+			*(void **)(&hookfunc) = dlsym(mlm, name);
 			if (hookfunc)
 				*mcf_ptr = hookfunc();
 			else {
